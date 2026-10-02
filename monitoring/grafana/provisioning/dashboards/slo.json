@@ -3,6 +3,7 @@
   "editable": true,
   "schemaVersion": 39,
   "version": 1,
+  "uid": "slo-error-budget",
   "title": "SLO & Error Budget — Reliability Lab",
   "tags": ["sre", "slo", "error-budget"],
   "time": { "from": "now-1h", "to": "now" },

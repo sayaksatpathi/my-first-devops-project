@@ -1,14 +1,55 @@
 # my-first-devops-project
 
-A minimal DevOps starter: a tiny Flask web service wired up with tests, a
-Dockerfile, and a GitHub Actions CI/CD pipeline. It's intentionally small so you
-can see every moving part of a DevOps workflow end to end.
+[![CI/CD](https://github.com/sayaksatpathi/my-first-devops-project/actions/workflows/ci.yml/badge.svg)](https://github.com/sayaksatpathi/my-first-devops-project/actions/workflows/ci.yml)
+[![GHCR image](https://img.shields.io/badge/GHCR-my--first--devops--project-2496ED?logo=github)](https://github.com/sayaksatpathi/my-first-devops-project/pkgs/container/my-first-devops-project)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-containerised-2496ED?logo=docker&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-metrics-E6522C?logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)
 
-It also doubles as a **Reliability Lab** for learning SRE: the service is
-instrumented with Prometheus metrics and ships with a local Prometheus +
-Grafana stack so you can define SLOs, watch the golden signals, and (soon)
-practise alerting and chaos engineering. See
-[The Reliability Lab](#the-reliability-lab-observability-stack) below.
+A small Flask web service taken all the way from code to a running, **observable,
+production-style service** — with tests, containerisation, a GitHub Actions
+CI/CD pipeline that publishes to a container registry, and a complete **SRE
+Reliability Lab**: metrics, SLOs, error budgets, burn-rate alerting, load
+testing, chaos engineering, and incident runbooks.
+
+It's intentionally small so every moving part is visible end to end — a
+hands-on tour of how a real service is built, shipped, and *kept reliable*.
+
+### What this project demonstrates
+
+| Area | Skills shown |
+|------|--------------|
+| **DevOps / CI-CD** | Automated testing, Docker builds, smoke tests, image publishing to GHCR on every merge |
+| **Observability** | Prometheus instrumentation (RED method), Grafana dashboards of the four golden signals |
+| **Reliability (SRE)** | SLIs, SLOs, **error budgets**, multi-window **burn-rate alerting** (the Google SRE pattern) |
+| **Resilience testing** | k6 load testing with pass/fail thresholds; chaos experiments with fault injection |
+| **Incident response** | An alert-linked runbook and a blameless postmortem template |
+
+## Architecture
+
+**Delivery pipeline** — every push is tested, built, and (on `main`) published:
+
+```mermaid
+flowchart LR
+    dev[Push / PR] --> ci{{GitHub Actions}}
+    ci --> test[Lint and Test<br/>pytest]
+    test --> build[Build image<br/>+ smoke-test /health]
+    build --> pub[Publish to GHCR<br/>main only]
+    pub --> reg[(ghcr.io<br/>:latest + :sha)]
+```
+
+**Runtime & observability** — the service exposes metrics that Prometheus
+scrapes, Grafana visualises, and Alertmanager pages on:
+
+```mermaid
+flowchart LR
+    user[Traffic / k6 / chaos] --> app[Flask app<br/>/ · /health · /work · /metrics]
+    app -- scrape /metrics --> prom[Prometheus<br/>recording + alert rules]
+    prom -- queries --> graf[Grafana<br/>Golden Signals + SLO dashboards]
+    prom -- fires alerts --> am[Alertmanager<br/>burn-rate alerts]
+    am -- page / ticket --> oncall[On-call + runbook]
+```
 
 ## What's inside
 
@@ -23,7 +64,7 @@ practise alerting and chaos engineering. See
 | `monitoring/` | Prometheus config, recording + alert rules, Grafana dashboards/data source, Alertmanager config |
 | `SLO.md` | Service Level Objectives and error-budget definitions |
 | `load/` | k6 load test and a chaos-experiment script |
-| `docs/` | Incident runbook and a blameless postmortem template |
+| `docs/` | Incident runbook, blameless postmortem template, and dashboard screenshots |
 | `.github/workflows/ci.yml` | CI/CD: runs tests, builds & smoke-tests the image, then publishes it to GHCR |
 
 ## Run it locally
@@ -71,12 +112,16 @@ Then open:
 | <http://localhost:9093> | **Alertmanager** — groups and routes firing alerts. |
 | <http://localhost:8080> | The app itself. |
 
-The Grafana dashboard tracks the **four golden signals** of monitoring:
+The **Golden Signals** dashboard tracks the four signals every service should
+watch — traffic, errors, latency (p95/p99), and saturation:
 
-- **Traffic** — request rate per endpoint
-- **Errors** — percentage of requests returning `5xx`
-- **Latency** — p95 / p99 response times
-- **Saturation** — requests currently in flight
+![Golden Signals dashboard](docs/screenshots/golden-signals.png)
+
+The **SLO & Error Budget** dashboard turns those into reliability targets —
+here captured mid-incident, with availability below target, the error budget
+blown, and the burn rate spiking (see [`SLO.md`](SLO.md)):
+
+![SLO and Error Budget dashboard](docs/screenshots/slo-error-budget.png)
 
 To see the graphs come alive, generate some traffic (in another terminal):
 
@@ -111,9 +156,15 @@ if they're breached — so it doubles as a release gate.
 
 While it runs, watch the alert go `PENDING → FIRING` at
 <http://localhost:9090/alerts> and appear in Alertmanager at
-<http://localhost:9093>. When something breaks for real, follow the
-[runbook](docs/runbooks/high-error-rate.md) and, afterwards, write up what
-happened with the [postmortem template](docs/postmortem-template.md).
+<http://localhost:9093>:
+
+![Prometheus alerts firing](docs/screenshots/prometheus-alerts.png)
+
+Here `ErrorBudgetFastBurn` is firing (red) while `ErrorBudgetSlowBurn` is still
+pending (yellow) — the fast-burn alert pages first. When something breaks for
+real, follow the [runbook](docs/runbooks/high-error-rate.md) and, afterwards,
+write up what happened with the
+[postmortem template](docs/postmortem-template.md).
 
 ## Run it with Docker
 
