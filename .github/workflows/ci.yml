@@ -1,0 +1,52 @@
+name: CI/CD
+
+# Run on every push and pull request to main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest -v
+
+  docker:
+    name: Build Docker image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t my-first-devops-project:${{ github.sha }} .
+
+      - name: Smoke-test the container
+        run: |
+          docker run -d --name app -p 8080:8080 my-first-devops-project:${{ github.sha }}
+          # Give the app a moment to start, then hit /health
+          for i in $(seq 1 10); do
+            if curl -fs http://localhost:8080/health; then
+              echo "Health check passed"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Health check failed" && docker logs app && exit 1
