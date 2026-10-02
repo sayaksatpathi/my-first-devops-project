@@ -6,6 +6,7 @@
 ![Docker](https://img.shields.io/badge/Docker-containerised-2496ED?logo=docker&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-metrics-E6522C?logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A small Flask web service taken all the way from code to a running, **observable,
 production-style service** — with tests, containerisation, a GitHub Actions
@@ -65,6 +66,7 @@ flowchart LR
 | `SLO.md` | Service Level Objectives and error-budget definitions |
 | `load/` | k6 load test and a chaos-experiment script |
 | `docs/` | Incident runbook, blameless postmortem template, and dashboard screenshots |
+| `LICENSE` | MIT License |
 | `.github/workflows/ci.yml` | CI/CD: runs tests, builds & smoke-tests the image, then publishes it to GHCR |
 
 ## Run it locally
@@ -223,3 +225,7 @@ The lab is built in phases. Done so far, and what's next:
 
 - Deploy the published image to a host (Render, Fly.io, AWS, etc.).
 - Add linting (ruff) and type checks (mypy) to the pipeline.
+
+## License
+
+Released under the [MIT License](LICENSE) — free to use, modify, and share.
