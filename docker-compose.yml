@@ -1,0 +1,42 @@
+name: reliability-lab
+
+# The Reliability Lab: your app + a full monitoring stack, all local.
+#   - app        : the Flask service, exposing /metrics for Prometheus
+#   - prometheus : scrapes and stores the metrics (UI on :9090)
+#   - grafana    : dashboards built on top of Prometheus (UI on :3000)
+#
+# Start it with:   docker compose up --build
+# Then open:       http://localhost:3000   (Grafana, login admin / admin)
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      # Make the simulated workload produce interesting data out of the box.
+      - WORK_FAIL_RATE=0.05
+      - WORK_MAX_MS=400
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.53.2
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
