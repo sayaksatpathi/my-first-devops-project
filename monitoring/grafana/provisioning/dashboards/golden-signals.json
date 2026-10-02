@@ -3,6 +3,7 @@
   "editable": true,
   "schemaVersion": 39,
   "version": 1,
+  "uid": "golden-signals",
   "title": "Golden Signals — Reliability Lab",
   "tags": ["sre", "golden-signals"],
   "time": { "from": "now-15m", "to": "now" },
