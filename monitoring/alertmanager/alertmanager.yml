@@ -1,0 +1,36 @@
+# Alertmanager configuration.
+#
+# Alertmanager takes alerts that Prometheus fires, groups/deduplicates them,
+# and routes them to receivers (Slack, PagerDuty, email, ...). In this lab no
+# real notifier is wired up — firing alerts are visible in the Alertmanager UI
+# (http://localhost:9093) and in Prometheus (http://localhost:9090/alerts).
+
+route:
+  receiver: "default"
+  group_by: ["alertname", "slo"]
+  group_wait: 10s       # wait a moment to batch alerts that fire together
+  group_interval: 30s   # how often to send updates about a group
+  repeat_interval: 1h   # re-notify for still-firing alerts this often
+  routes:
+    # Critical alerts could go to a pager; here they share the default receiver.
+    - matchers:
+        - severity = "critical"
+      receiver: "default"
+
+receivers:
+  - name: "default"
+    # No notifier configured on purpose (keeps the lab self-contained, with no
+    # secrets). To send to Slack, uncomment and add YOUR webhook URL — treat it
+    # as a secret; do not commit a real one:
+    #
+    # slack_configs:
+    #   - api_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+    #     channel: "#alerts"
+    #     title: "{{ .CommonAnnotations.summary }}"
+    #     text: "{{ .CommonAnnotations.description }}\nRunbook: {{ .CommonAnnotations.runbook_url }}"
+
+inhibit_rules:
+  # When a critical alert for an SLO is firing, silence the matching warning.
+  - source_matchers: [severity = "critical"]
+    target_matchers: [severity = "warning"]
+    equal: ["slo"]

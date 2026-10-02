@@ -1,0 +1,29 @@
+# Prometheus configuration for the Reliability Lab.
+# It scrapes the Flask app's /metrics endpoint every few seconds.
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+# Recording rules compute the SLIs/burn rates; alert rules fire on them.
+rule_files:
+  - /etc/prometheus/rules/slo_rules.yml
+  - /etc/prometheus/rules/alerts.yml
+
+# Send firing alerts to Alertmanager.
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  # Prometheus scraping itself (handy for sanity checks).
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # The Flask application. "app" is the service name from docker-compose.yml,
+  # which Docker resolves to the container's address on the shared network.
+  - job_name: "flask-app"
+    static_configs:
+      - targets: ["app:8080"]

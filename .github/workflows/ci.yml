@@ -50,3 +50,33 @@ jobs:
             sleep 2
           done
           echo "Health check failed" && docker logs app && exit 1
+
+  publish:
+    name: Publish image to GHCR
+    needs: docker
+    runs-on: ubuntu-latest
+    # Only publish from pushes to main — never from pull requests or other branches
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # Tag with both the exact commit SHA (immutable) and 'latest' (moving pointer)
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
