@@ -26,6 +26,16 @@ services:
     volumes:
       # Mount the whole dir so prometheus.yml and rules/ are both available.
       - ./monitoring/prometheus:/etc/prometheus:ro
+    depends_on:
+      - alertmanager
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     restart: unless-stopped
 
   grafana:

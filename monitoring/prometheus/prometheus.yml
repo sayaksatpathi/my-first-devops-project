@@ -5,9 +5,16 @@ global:
   scrape_interval: 5s
   evaluation_interval: 5s
 
-# Recording rules compute the SLIs and burn rates (see SLO.md).
+# Recording rules compute the SLIs/burn rates; alert rules fire on them.
 rule_files:
   - /etc/prometheus/rules/slo_rules.yml
+  - /etc/prometheus/rules/alerts.yml
+
+# Send firing alerts to Alertmanager.
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
 
 scrape_configs:
   # Prometheus scraping itself (handy for sanity checks).

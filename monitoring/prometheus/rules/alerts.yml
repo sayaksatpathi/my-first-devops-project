@@ -1,0 +1,39 @@
+# Alerting rules for the availability SLO, using the Google SRE
+# "multi-window, multi-burn-rate" pattern.
+#
+# Why two windows per alert? A single short window is twitchy (false pages on
+# brief blips); a single long window is slow to fire. Requiring BOTH a short
+# and a long window to breach at once gives you alerts that are fast *and*
+# stable. See SLO.md for burn-rate basics.
+
+groups:
+  - name: slo_alerts
+    rules:
+      # ---- Fast burn -> page someone now ----
+      # 14.4x burn over 1h would exhaust a 30-day budget in ~2 days.
+      - alert: ErrorBudgetFastBurn
+        expr: slo:availability:burnrate5m > 14.4 and slo:availability:burnrate1h > 14.4
+        for: 1m
+        labels:
+          severity: critical
+          slo: availability
+        annotations:
+          summary: "Availability SLO: fast error-budget burn (PAGE)"
+          description: >
+            5m and 1h burn rates are both above 14.4x. At this pace the 30-day
+            error budget is gone in ~2 days. Investigate 5xx errors immediately.
+          runbook_url: "https://github.com/sayaksatpathi/my-first-devops-project/blob/main/docs/runbooks/high-error-rate.md"
+
+      # ---- Slow burn -> open a ticket ----
+      - alert: ErrorBudgetSlowBurn
+        expr: slo:availability:burnrate30m > 6 and slo:availability:burnrate1h > 6
+        for: 2m
+        labels:
+          severity: warning
+          slo: availability
+        annotations:
+          summary: "Availability SLO: sustained error-budget burn (TICKET)"
+          description: >
+            30m and 1h burn rates are both above 6x. Open a ticket and
+            investigate before the error budget is exhausted.
+          runbook_url: "https://github.com/sayaksatpathi/my-first-devops-project/blob/main/docs/runbooks/high-error-rate.md"
