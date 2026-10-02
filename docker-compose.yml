@@ -24,7 +24,8 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      # Mount the whole dir so prometheus.yml and rules/ are both available.
+      - ./monitoring/prometheus:/etc/prometheus:ro
     restart: unless-stopped
 
   grafana:

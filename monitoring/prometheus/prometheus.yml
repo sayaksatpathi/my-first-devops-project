@@ -5,6 +5,10 @@ global:
   scrape_interval: 5s
   evaluation_interval: 5s
 
+# Recording rules compute the SLIs and burn rates (see SLO.md).
+rule_files:
+  - /etc/prometheus/rules/slo_rules.yml
+
 scrape_configs:
   # Prometheus scraping itself (handy for sanity checks).
   - job_name: "prometheus"

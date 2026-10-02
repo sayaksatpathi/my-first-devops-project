@@ -1,0 +1,33 @@
+# Recording rules that pre-compute the SLIs and error-budget burn rates.
+# Pre-computing keeps the Grafana dashboards and (Phase 4) alert rules simple
+# and fast. See SLO.md for what each target means.
+#
+# SLO targets:
+#   - Availability: 99.9% success  -> error budget = 0.001 (0.1%)
+#   - Latency:      99%  under 500ms -> error budget = 0.01  (1%)
+
+groups:
+  - name: slo_recording_rules
+    interval: 15s
+    rules:
+      # ---- Availability: fraction of requests that FAILED (5xx) ----
+      # Short window (5m) — reacts fast, used for burn-rate alerting.
+      - record: sli:http_errors:ratio_rate5m
+        expr: sum(rate(http_requests_total{http_status=~"5.."}[5m])) / clamp_min(sum(rate(http_requests_total[5m])), 1e-9)
+      # Medium window (30m) — the lab's stand-in for the SLO window.
+      - record: sli:http_errors:ratio_rate30m
+        expr: sum(rate(http_requests_total{http_status=~"5.."}[30m])) / clamp_min(sum(rate(http_requests_total[30m])), 1e-9)
+      # Long window (1h) — the slower half of a multi-window burn-rate alert.
+      - record: sli:http_errors:ratio_rate1h
+        expr: sum(rate(http_requests_total{http_status=~"5.."}[1h])) / clamp_min(sum(rate(http_requests_total[1h])), 1e-9)
+
+      # ---- Latency: fraction of requests SLOWER than 500ms ----
+      - record: sli:http_latency_slow:ratio_rate30m
+        expr: 1 - (sum(rate(http_request_duration_seconds_bucket{le="0.5"}[30m])) / clamp_min(sum(rate(http_request_duration_seconds_count[30m])), 1e-9))
+
+      # ---- Error-budget burn rates (error ratio / allowed budget) ----
+      # A value of 1 means "spending the budget exactly on pace"; >1 is too fast.
+      - record: slo:availability:burnrate5m
+        expr: sli:http_errors:ratio_rate5m / 0.001
+      - record: slo:availability:burnrate1h
+        expr: sli:http_errors:ratio_rate1h / 0.001

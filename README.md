@@ -63,7 +63,7 @@ Then open:
 
 | URL | What you'll see |
 |-----|-----------------|
-| <http://localhost:3000> | **Grafana** — log in with `admin` / `admin`. Open the pre-built *"Golden Signals — Reliability Lab"* dashboard. |
+| <http://localhost:3000> | **Grafana** — log in with `admin` / `admin`. Two pre-built dashboards: *"Golden Signals — Reliability Lab"* and *"SLO & Error Budget"* (see [`SLO.md`](SLO.md)). |
 | <http://localhost:9090> | **Prometheus** — the raw metrics database and query UI. |
 | <http://localhost:8080> | The app itself. |
 
@@ -122,8 +122,9 @@ The lab is built in phases. Done so far, and what's next:
 - [x] **Phase 1 — Instrument:** RED-method Prometheus metrics in the app.
 - [x] **Phase 2 — Stack:** Prometheus + Grafana via `docker compose`, with a
       pre-built golden-signals dashboard.
-- [ ] **Phase 3 — SLOs:** define SLIs/SLOs (e.g. 99.9% availability, p99 < 300ms)
-      and an error budget.
+- [x] **Phase 3 — SLOs:** SLIs/SLOs and error budget defined in
+      [`SLO.md`](SLO.md), computed by Prometheus recording rules, and shown on
+      the *"SLO & Error Budget"* Grafana dashboard.
 - [ ] **Phase 4 — Alerting:** Alertmanager with multi-window burn-rate alerts.
 - [ ] **Phase 5 — Load & chaos:** a load generator (k6/Locust) and chaos
       experiments to watch alerts fire and recover.
