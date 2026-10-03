@@ -62,7 +62,7 @@ def _record_metrics(response):
 @app.get("/")
 def index():
     return jsonify(
-        message="Hello from my-first-devops-project!",
+        message="Hello from Reliability Lab!",
         status="ok",
     )
 

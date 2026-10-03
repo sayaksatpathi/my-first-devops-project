@@ -36,11 +36,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build image
-        run: docker build -t my-first-devops-project:${{ github.sha }} .
+        run: docker build -t reliability-lab:${{ github.sha }} .
 
       - name: Smoke-test the container
         run: |
-          docker run -d --name app -p 8080:8080 my-first-devops-project:${{ github.sha }}
+          docker run -d --name app -p 8080:8080 reliability-lab:${{ github.sha }}
           # Give the app a moment to start, then hit /health
           for i in $(seq 1 10); do
             if curl -fs http://localhost:8080/health; then

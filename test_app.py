@@ -12,7 +12,7 @@ def test_index_returns_ok():
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["status"] == "ok"
-    assert "devops-project" in data["message"].lower()
+    assert "reliability" in data["message"].lower()
 
 
 def test_health_is_healthy():
