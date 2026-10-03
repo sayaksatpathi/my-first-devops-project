@@ -41,7 +41,7 @@ Stop the bleeding before root-causing:
 
 - **Roll back** to the last known-good image:
   ```bash
-  docker pull ghcr.io/sayaksatpathi/my-first-devops-project:<previous-good-sha>
+  docker pull ghcr.io/sayaksatpathi/reliability-lab:<previous-good-sha>
   # redeploy that tag
   ```
 - If a specific feature is at fault, disable it (feature flag / config).

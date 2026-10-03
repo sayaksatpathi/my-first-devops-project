@@ -1,7 +1,9 @@
-# my-first-devops-project
+# Project 1 — Reliability Lab
 
-[![CI/CD](https://github.com/sayaksatpathi/my-first-devops-project/actions/workflows/ci.yml/badge.svg)](https://github.com/sayaksatpathi/my-first-devops-project/actions/workflows/ci.yml)
-[![GHCR image](https://img.shields.io/badge/GHCR-my--first--devops--project-2496ED?logo=github)](https://github.com/sayaksatpathi/my-first-devops-project/pkgs/container/my-first-devops-project)
+**An SRE reliability lab: SLOs, error budgets, and burn-rate alerting on a fully instrumented service.**
+
+[![CI/CD](https://github.com/sayaksatpathi/reliability-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/sayaksatpathi/reliability-lab/actions/workflows/ci.yml)
+[![GHCR image](https://img.shields.io/badge/GHCR-reliability--lab-2496ED?logo=github)](https://github.com/sayaksatpathi/reliability-lab/pkgs/container/reliability-lab)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-containerised-2496ED?logo=docker&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-metrics-E6522C?logo=prometheus&logoColor=white)
@@ -171,8 +173,8 @@ write up what happened with the
 ## Run it with Docker
 
 ```bash
-docker build -t my-first-devops-project .
-docker run -p 8080:8080 my-first-devops-project
+docker build -t reliability-lab .
+docker run -p 8080:8080 reliability-lab
 ```
 
 ## The CI/CD pipeline
@@ -192,8 +194,8 @@ You can watch runs under the **Actions** tab on GitHub.
 Once a build on `main` finishes, the image is available from GHCR:
 
 ```bash
-docker pull ghcr.io/sayaksatpathi/my-first-devops-project:latest
-docker run -p 8080:8080 ghcr.io/sayaksatpathi/my-first-devops-project:latest
+docker pull ghcr.io/sayaksatpathi/reliability-lab:latest
+docker run -p 8080:8080 ghcr.io/sayaksatpathi/reliability-lab:latest
 ```
 
 The package shows up under the repo's **Packages** section on GitHub. The

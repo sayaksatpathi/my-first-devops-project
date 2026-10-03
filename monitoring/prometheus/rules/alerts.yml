@@ -22,7 +22,7 @@ groups:
           description: >
             5m and 1h burn rates are both above 14.4x. At this pace the 30-day
             error budget is gone in ~2 days. Investigate 5xx errors immediately.
-          runbook_url: "https://github.com/sayaksatpathi/my-first-devops-project/blob/main/docs/runbooks/high-error-rate.md"
+          runbook_url: "https://github.com/sayaksatpathi/reliability-lab/blob/main/docs/runbooks/high-error-rate.md"
 
       # ---- Slow burn -> open a ticket ----
       - alert: ErrorBudgetSlowBurn
@@ -36,4 +36,4 @@ groups:
           description: >
             30m and 1h burn rates are both above 6x. Open a ticket and
             investigate before the error budget is exhausted.
-          runbook_url: "https://github.com/sayaksatpathi/my-first-devops-project/blob/main/docs/runbooks/high-error-rate.md"
+          runbook_url: "https://github.com/sayaksatpathi/reliability-lab/blob/main/docs/runbooks/high-error-rate.md"
